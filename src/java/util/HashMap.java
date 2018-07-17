@@ -27,40 +27,21 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     private static final long serialVersionUID = 362498820763181265L;
 
 
-    /**
-     * 默认的初始容量（容量为HashMap中槽的数目）是16，且实际容量必须是2的整数次幂。
-     */
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
+    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;     // aka 16 默认的初始容量（容量为HashMap中槽的数目）是16，且实际容量必须是2的整数次幂。
 
-    /**
-     * 最大容量（必须是2的幂且小于2的30次方，传入容量过大将被这个值替换）
-     */
-    static final int MAXIMUM_CAPACITY = 1 << 30;
+    static final int MAXIMUM_CAPACITY = 1 << 30;            //最大容量（必须是2的幂且小于2的30次方，传入容量过大将被这个值替换）
 
-    /**
-     * 默认装填因子0.75，如果当前键值对个数 >= HashMap最大容量*装填因子，进行rehash操作
-     */
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;         //默认装填因子0.75，如果当前键值对个数 >= HashMap最大容量*装填因子，进行rehash操作
 
-    /**
-     * JDK1.8 新加，Entry链表最大长度，当桶中节点数目大于该长度时，将链表转成红黑树存储；
-     */
-    static final int TREEIFY_THRESHOLD = 8;
+    static final int TREEIFY_THRESHOLD = 8;                 //JDK1.8 新加，Entry链表最大长度，当桶中节点数目大于该长度时，将链表转成红黑树存储；
 
-    /**
-     * JDK1.8 新加，当桶中节点数小于该长度，将红黑树转为链表存储；
-     */
-    static final int UNTREEIFY_THRESHOLD = 6;
+    static final int UNTREEIFY_THRESHOLD = 6;               //JDK1.8 新加，当桶中节点数小于该长度，将红黑树转为链表存储；
 
-    /**
-     * 桶可能被转化为树形结构的最小容量。当哈希表的大小超过这个阈值，才会把链式结构转化成树型结构，否则仅采取扩容来尝试减少冲突。
-     * 应该至少4*TREEIFY_THRESHOLD来避免扩容和树形结构化之间的冲突。
-     */
+    //桶可能被转化为树形结构的最小容量。当哈希表的大小超过这个阈值，才会把链式结构转化成树型结构，
+    //否则仅采取扩容来尝试减少冲突。应该至少4*TREEIFY_THRESHOLD来避免扩容和树形结构化之间的冲突。
     static final int MIN_TREEIFY_CAPACITY = 64;
 
-    /**
-     * JDK1.6用Entry描述键值对，JDK1.8中用Node代替Entry
-     */
+    //JDK1.6用Entry描述键值对，JDK1.8中用Node代替Entry
     static class Node<K, V> implements Map.Entry<K, V> {
         // hash存储key的hashCode
         final int hash;
@@ -94,12 +75,14 @@ public class HashMap<K, V> extends AbstractMap<K, V>
             return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
 
+        //设置新value返回旧value
         public final V setValue(V newValue) {
             V oldValue = value;
             value = newValue;
             return oldValue;
         }
 
+        //当引用相同 或者 key、value引用都相同 则返回true
         public final boolean equals(Object o) {
             if (o == this)
                 return true;
@@ -126,6 +109,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
         int h;
         //计算key的hashCode, h = Objects.hashCode(key)
         //h >>> 16表示对h无符号右移16位，高位补0，然后h与h >>> 16按位异或
+        //即 hashCode的后16位与前16位亦或，前16位不变
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
@@ -179,39 +163,17 @@ public class HashMap<K, V> extends AbstractMap<K, V>
 
     /* ---------------- Fields -------------- */
 
-    /**
-     * 哈希桶数组，分配的时候，table的长度总是2的幂
-     */
-    transient Node<K, V>[] table;
+    transient Node<K, V>[] table;           //哈希桶数组，分配的时候，table的长度总是2的幂
 
-    /**
-     * HashMap将数据转换成set的另一种存储形式，这个变量主要用于迭代功能
-     */
-    transient Set<Map.Entry<K, V>> entrySet;
+    transient Set<Map.Entry<K, V>> entrySet;//HashMap将数据转换成set的另一种存储形式，这个变量主要用于迭代功能
 
-    /**
-     * 实际存储的数量，则HashMap的size()方法，实际返回的就是这个值，isEmpty()也是判断该值是否为0
-     */
-    transient int size;
+    transient int size;                     //实际存储的数量，则HashMap的size()方法，实际返回的就是这个值，isEmpty()也是判断该值是否为0
 
-    /**
-     * hashmap结构被改变的次数，fail-fast机制
-     */
-    transient int modCount;
+    transient int modCount;                 //hashmap结构被改变的次数，fail-fast机制
 
-    /**
-     * HashMap的扩容阈值，在HashMap中存储的Node键值对超过这个数量时，自动扩容容量为原来的二倍
-     *
-     * @serial
-     */
-    int threshold;
+    int threshold;                          //HashMap的扩容阈值，在HashMap中存储的Node键值对超过这个数量时，自动扩容容量为原来的二倍
 
-    /**
-     * HashMap的负加载因子，可计算出当前table长度下的扩容阈值：threshold = loadFactor * table.length
-     *
-     * @serial
-     */
-    final float loadFactor;
+    final float loadFactor;                 //HashMap的负载因子，可计算出当前table长度下的扩容阈值：threshold = loadFactor * table.length
 
     /* ---------------- Public operations -------------- */
 
@@ -307,7 +269,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
     }
 
     /**
-     * 如果map中没有键值对映射，返回true
+     * 如果map中没有键值对，返回true
      *
      * @return 如果map中没有键值对映射，返回true
      */
@@ -438,7 +400,7 @@ public class HashMap<K, V> extends AbstractMap<K, V>
          * Hash函数，(n - 1) & hash 计算key将被放置的槽位
          * (n - 1) & hash 本质上是hash % n，位运算更快
          */
-        if ((p = tab[i = (n - 1) & hash]) == null)
+        if ((p = tab[i = (n - 1) & hash]) == null)//插入位置没有值
             //直接将键值对插入到map中即可
             tab[i] = newNode(hash, key, value, null);
         else {// 桶中已经存在元素
